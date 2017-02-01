@@ -6,9 +6,6 @@ public class Control : MonoBehaviour
 {
 	// Use this for initialization
 	public float speed;
-
-	public float MinTurnSpeed;
-
 	public GameObject bullet;
 	public float bulletSpeed;
 	public float ShootPause;
@@ -53,20 +50,15 @@ public class Control : MonoBehaviour
 
 	void Rotate ()
 	{
-		if (velocity.magnitude >= MinTurnSpeed) {
-			if (Vector3.Dot (Vector3.right, velocity) > 0) {
-				transform.rotation = Quaternion.Euler (0.0f, 0.0f, -Vector3.Angle (velocity, Vector3.up));
-			} else {
-				transform.rotation = Quaternion.Euler (0.0f, 0.0f, Vector3.Angle (velocity, Vector3.up));
-			}
-				
-		}
+		float rotationDegree = Mathf.Atan2(velocity.y, velocity.x) * Mathf.Rad2Deg;
+		if(rotationDegree != 0)
+			transform.rotation = Quaternion.Euler (0.0f, 0.0f, rotationDegree);
 	}
 
 	void Shoot ()
 	{
 		GameObject new_Bullet = Instantiate (bullet, transform.position, transform.rotation) as GameObject;
-		new_Bullet.GetComponent<Rigidbody2D> ().velocity = transform.rotation * Vector2.up * bulletSpeed;
+		new_Bullet.GetComponent<Rigidbody2D> ().velocity = transform.rotation * Vector2.right * bulletSpeed;
 	}
 
 	public Vector3 getVelocity()
