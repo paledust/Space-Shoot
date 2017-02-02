@@ -51,7 +51,7 @@ public class Control : MonoBehaviour
 	void Rotate ()
 	{
 		float rotationDegree = Mathf.Atan2(velocity.y, velocity.x) * Mathf.Rad2Deg;
-		if(rotationDegree != 0)
+		if(velocity.magnitude != 0)
 			transform.rotation = Quaternion.Euler (0.0f, 0.0f, rotationDegree);
 	}
 
