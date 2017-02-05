@@ -4,14 +4,10 @@ using UnityEngine;
 
 public class Enemy_Trace : EnemyBase {
 	private Quaternion originalRotation;
-	public float FollowSpeed;
 	
 	void Start()
 	{
 		base.Start();
-		
-		moveSpeed = Random.Range(0.5f,2.0f);
-		originalRotation = transform.rotation;
 	}
 
 	override protected void ColorInitial()
@@ -23,16 +19,16 @@ public class Enemy_Trace : EnemyBase {
 		GetComponent<TrailRenderer>().endColor = ShipColor;
 	}
 
+	override protected void MoveInitial()
+	{
+		originalRotation = transform.rotation;
+	}
+
 	//Enemy will copy how the player "control" the ship with different initial speed.
 	override protected void Move()
 	{
 		Vector3 playerVelocity = player.GetComponent<Control>().getVelocity();
 		velocity = (originalRotation * playerVelocity.normalized).normalized * playerVelocity.magnitude * moveSpeed;
 		transform.position += velocity;
-	}
-
-	override protected void rotate()
-	{
-		transform.rotation = player.transform.rotation * originalRotation;
 	}
 }

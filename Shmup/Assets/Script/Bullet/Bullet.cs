@@ -7,7 +7,6 @@ public class Bullet : MonoBehaviour {
 	public float damage;
 	// Use this for initialization
 	void Start () {
-		Destroy(gameObject,lifeTime);
 	}
 
 	void OnCollisionEnter2D(Collision2D collision)
@@ -16,5 +15,10 @@ public class Bullet : MonoBehaviour {
 		{
 			collision.gameObject.GetComponent<EnemyBase>().ApplyDamage(damage);
 		}
+	}
+
+	void OnBecameInvisible()
+	{
+		Destroy(gameObject);
 	}
 }

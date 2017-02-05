@@ -5,10 +5,14 @@ using UnityEngine;
 public class EnemyBase : MonoBehaviour {
 	static protected GameObject player;
 	public Color32 ShipColor;
-	public float health;
-	public AudioClip destroySound;
-	public float moveSpeed;
+	public Vector2 SpeedRange;
+	[SerializeField] protected float health;
+	[SerializeField] protected AudioClip destroySound;
+	[SerializeField] protected AudioClip spawnSound;
+	[SerializeField] protected float moveSpeed;
 	protected Vector3 velocity;
+	protected bool ifMove = true;
+	protected bool ifKill = false;
 	// Use this for initialization
 	protected void Awake()
 	{
@@ -18,44 +22,68 @@ public class EnemyBase : MonoBehaviour {
 		if(!GetComponent<AudioSource>())
 			gameObject.AddComponent<AudioSource>();
 
+		GetComponent<AudioSource>().PlayOneShot(spawnSound);
+		moveSpeed = Random.Range(SpeedRange.x,SpeedRange.y);
 		ColorInitial();
+		MoveInitial();
 	}
 
+	//Initialize the Color 
 	virtual protected void ColorInitial()
 	{
 
 	}
+
+	//For movement Initialize
+	virtual protected void MoveInitial()
+	{
+		
+	}
 	
 	// Update is called once per frame
 	protected void Update () {
-		Move();
+		if(ifMove)
+			Move();
+
 		rotate();
-		Kill();
+		if(health <= 0.0f && !ifKill)
+			Kill();
 	}
 
+	//Describe how the Enemy Move
 	virtual protected void Move()
 	{
 		
 	}
 
+	//Describe how the Enemy Rotate
 	virtual protected void rotate()
 	{
-
+		float rotationDegree = Mathf.Atan2(velocity.y, velocity.x) * Mathf.Rad2Deg;
+		if(velocity.magnitude >= 0.01f)
+			transform.rotation = Quaternion.Euler (0.0f, 0.0f, rotationDegree);
 	}
 
 	virtual public void ApplyDamage(float Damage)
 	{
 		health -= Damage;
+		HitSound();
 	}
 
 	protected void HitSound()
 	{
 		GetComponent<AudioSource>().PlayOneShot(destroySound);
 	}
-	protected void Kill()
+	virtual protected void Kill()
 	{
+		ifKill = true;
 		HitSound();
-		if(health <= 0.0f)
-			Destroy(gameObject);
+		Destroy(gameObject,5.0f);
+		ifMove = false;
+	}
+
+	public void ResetTarget(GameObject target)
+	{
+		player = target;
 	}
 }

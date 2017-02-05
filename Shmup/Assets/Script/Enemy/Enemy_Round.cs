@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Enemy_Round : EnemyBase {
 	public float detectRange;
-	public float circlingRadius;
-	public float followRange;
+	public Vector2 CirclingRange;
+	[SerializeField] private float circlingRadius;
 	private float distanceToPlayer;
 	// Use this for initialization
 	void Start () {
@@ -17,16 +17,11 @@ public class Enemy_Round : EnemyBase {
 		distanceToPlayer = (player.transform.position - transform.position).magnitude;
 		if(distanceToPlayer <= detectRange)
 		{
-			if(distanceToPlayer <= circlingRadius)
-			{
-				circling();
-			}
-			else
-			{
-				moveToplayer();
-			}
+			Circling();
 		}
 
+		velocity *= 0.99f;
+		transform.position += velocity;
 	}
 	override protected void ColorInitial()
 	{
@@ -36,31 +31,16 @@ public class Enemy_Round : EnemyBase {
 		GetComponent<TrailRenderer>().startColor = ShipColor;
 		GetComponent<TrailRenderer>().endColor = ShipColor;
 	}
-	override protected void rotate()
+
+	override protected void MoveInitial()
 	{
-		float rotationDegree = Mathf.Atan2(velocity.y, velocity.x) * Mathf.Rad2Deg;
-		if(velocity.magnitude >= 0.01f)
-			transform.rotation = Quaternion.Euler (0.0f, 0.0f, rotationDegree);
+		circlingRadius = Random.Range(CirclingRange.x, CirclingRange.y);
 	}
-	//Enemy will circle around the player
-	void circling()
+
+	//Enemy will move towards player
+	void Circling()
 	{
 		Vector3 toPlayer = player.transform.position - transform.position;
-		velocity = Quaternion.Euler(0,0,90) * toPlayer.normalized * moveSpeed;
-
-		transform.position += velocity;
+		velocity = (toPlayer + Quaternion.Euler(0,0,90) * toPlayer.normalized * circlingRadius).normalized * moveSpeed;
 	}
-	//Enemy will move towards player
-	void moveToplayer()
-	{
-		// Vector3 toPlayer = player.transform.position - transform.position;
-		// velocity = (toPlayer + Quaternion.Euler(0,0,90) * toPlayer.normalized * circlingRadius).normalized * moveSpeed;
-
-		// transform.position += velocity;
-		float angle = 1000.0f * Time.deltaTime;
-		velocity = new Vector3(Mathf.Sin(angle)*Mathf.Rad2Deg, Mathf.Cos(angle)*Mathf.Rad2Deg, 0.0f);
-
-		transform.position += velocity;
-	}
-
 }
