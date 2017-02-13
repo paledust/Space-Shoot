@@ -3,22 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyBase : MonoBehaviour {
-	static protected GameObject player;
-	static protected EnemyManager enemyManager;
-	public Color32 ShipColor;
+	static public GameObject player;
+	static public EnemyManager enemyManager;
 	public Vector2 SpeedRange;
-	[SerializeField] protected float health;
+	public float health;
+	public EnemyType enemyType;
 	[SerializeField] protected AudioClip destroySound;
 	[SerializeField] protected AudioClip spawnSound;
 	[SerializeField] protected float moveSpeed;
+	protected Color32 ShipColor;
 	protected Vector3 velocity;
 	protected bool ifMove = true;
 	protected bool ifKill = false;
 	// Use this for initialization
 	protected void Awake()
 	{
-		player = GameObject.FindGameObjectWithTag("Player");
-		enemyManager = GameObject.Find("EnemyManager").GetComponent<EnemyManager>();
+		//player = GameObject.FindGameObjectWithTag("Player");
+		//enemyManager = GameObject.Find("EnemyManager").GetComponent<EnemyManager>();
 	}
 	protected void Start () {
 		if(!GetComponent<AudioSource>())

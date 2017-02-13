@@ -2,20 +2,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum SpawnPattern{
-	random = 0,
-	circle = 1,
-	oneByoneCircle = 2
-}
+public enum EnemyType{
+	RoundNormal = 0,
+	RoundCrazy = 1,
+	TraceNormal = 2,
+	TranceCrazy = 3
+};
 
 public class EnemyManager : MonoBehaviour {
-	public GameObject[] EnemyTypes;
-
-	public List<GameObject> enemyrounds = new List<GameObject>();
-	public List<GameObject> enemyTrace = new List<GameObject>();
+	protected enum SpawnPattern{
+		random = 0,
+		circle = 1,
+		oneByoneCircle = 2
+	};
+	public GameObject enemyBasicPrefeb;
+	public List<GameObject> enemyList  = new List<GameObject>();
 	public Transform[] SpawnLocation;
 	public int MaxSpawnNum;
 	public float waveCooldown;
+
+	protected Sprite enemySprite_Circle;
+	protected Sprite enemySprite_Arrow;
 
 	public float EnemyRatio;
 	private float timer;
@@ -25,18 +32,20 @@ public class EnemyManager : MonoBehaviour {
 	private SpawnPattern spawnPattern;
 	// Use this for initialization
 	void Start () {
-		GameObject[] allEnemy = GameObject.FindGameObjectsWithTag("Enemy");
-		foreach(GameObject enemy in allEnemy)
+		//Initialize Enemy Player System
+		if(!EnemyBase.enemyManager)
 		{
-			if(enemy.GetComponent<Enemy_Round>())
-			{
-				enemyrounds.Add(enemy);
-			}
-			if(enemy.GetComponent<Enemy_Trace>())
-			{
-				enemyTrace.Add(enemy);
-			}
+			EnemyBase.enemyManager = this;
 		}
+
+		//Initialize Enemy Manager System
+		if(!EnemyBase.player)
+		{
+			EnemyBase.player = GameObject.FindGameObjectWithTag("Player");
+		}
+
+		enemySprite_Circle = Resources.Load<Sprite>("Image/Enemy_1");
+		enemySprite_Arrow = Resources.Load<Sprite>("Image/SpaceShip");
 
 		ifWave = false;
 		timer = 0.0f;
@@ -56,63 +65,94 @@ public class EnemyManager : MonoBehaviour {
 		{
 			for(int i = 0; i<MaxSpawnNum; i++)
 			{
-				Create(EnemyTypes[Random.Range(0,EnemyTypes.Length)]);
+				EnemyType types = (EnemyType)Random.Range(0,4);
+				CreateEnemy(types);
 			}
 
 			ifWave = false;
 		}
 	}
 
-	public void Create(GameObject enemy)
+	//Create Types of Enemy
+	public GameObject CreateEnemy(EnemyType enemyType)
 	{
-		Debug.Log("Enemy:" + enemy.GetComponent<EnemyBase>().ToString() + "Create");
-		Instantiate(enemy, SpawnLocation[Random.Range(0,SpawnLocation.Length)].position,
-							SpawnLocation[Random.Range(0,SpawnLocation.Length)].rotation);
+		GameObject _enemy = Instantiate(enemyBasicPrefeb, SpawnLocation[Random.Range(0,SpawnLocation.Length)].position,
+			SpawnLocation[Random.Range(0,SpawnLocation.Length)].rotation) as GameObject;
 
-		if(enemy.GetComponent<Enemy_Round>())
+		_enemy.name = "Enemy" + enemyType.ToString() + CountType(enemyType).ToString();
+		
+		//Choose which type of Enemy to spawn and add component to make enmey
+		switch (enemyType)
 		{
-			enemyrounds.Add(enemy);
+			case EnemyType.RoundNormal:
+				_enemy.GetComponent<SpriteRenderer>().sprite = enemySprite_Arrow;
+				Enemy_Round _round = _enemy.AddComponent<Enemy_Round>();
+				_round.enemyType = EnemyType.RoundNormal;
+				_round.SpeedRange = new Vector2(0.5f,2.0f);
+				_round.CirclingRange = new Vector2(50,200);
+				_round.detectRange = 20.0f;
+				_round.health = 1.0f;
+
+				break;
+			case EnemyType.RoundCrazy:
+				_enemy.GetComponent<SpriteRenderer>().sprite = enemySprite_Arrow;
+				Enemy_Round _roundCrazy = _enemy.AddComponent<Enemy_Round>();
+				_roundCrazy.enemyType = EnemyType.RoundCrazy;
+				_roundCrazy.SpeedRange = new Vector2(10.0f,17.0f);
+				_roundCrazy.CirclingRange = new Vector2(15,17);
+				_roundCrazy.detectRange = 20.0f;
+				_roundCrazy.health = 1.0f;
+
+				break;
+			case EnemyType.TraceNormal:
+				_enemy.GetComponent<SpriteRenderer>().sprite = enemySprite_Circle;
+				_enemy.transform.localScale = Vector3.one;
+				Enemy_Trace _trace = _enemy.AddComponent<Enemy_Trace>();
+				_trace.enemyType = EnemyType.TraceNormal;
+				_trace.SpeedRange = new Vector2(0.2f,0.5f);
+				_trace.health = 1.0f;
+
+				break;
+			case EnemyType.TranceCrazy:
+				_enemy.GetComponent<SpriteRenderer>().sprite = enemySprite_Circle;
+				_enemy.GetComponent<TrailRenderer>().startWidth = 12;
+				_enemy.transform.localScale = Vector3.one * 10;
+				Enemy_Trace _traceCrazy = _enemy.AddComponent<Enemy_Trace>();
+				_traceCrazy.enemyType = EnemyType.TranceCrazy;
+				_traceCrazy.SpeedRange = new Vector2(0.5f,2.0f);
+				_traceCrazy.health = 1.0f;
+
+				break;
+			default:
+				Debug.Log("Can't Create Anything, Sorry!!");
+				return null;
 		}
-		if(enemy.GetComponent<Enemy_Trace>())
-		{
-			enemyTrace.Add(enemy);
-		}
+		//Complete making enemy
+
+		enemyList.Add(_enemy);
 
 		OnCreated();
+		return _enemy;
 	}
 
 	public void Destroy(GameObject enemy)
 	{
 		Debug.Log("Enemy:" + enemy.GetComponent<EnemyBase>().ToString() + "Destroy");
-
-		if(enemy.GetComponent<Enemy_Round>())
-			enemyrounds.Remove(enemy);
-		if(enemy.GetComponent<Enemy_Trace>())
-			enemyTrace.Remove(enemy);
+		enemyList.Remove(enemy);
 
 		Destroy(enemy, 5.0f);
 
 		OnDestroyed();
 	}
 
-	public void FactoryCreate(GameObject enemy)
-	{
-
-	}
-
 	public int CountAll()
 	{
-		return enemyrounds.Count + enemyTrace.Count;
+		return enemyList.Count;
 	}
 
-	public int CountRound()
+	public int CountType(EnemyType _enemyType)
 	{
-		return enemyrounds.Count;
-	}
-	
-	public int CountTrace()
-	{
-		return enemyTrace.Count;
+		return enemyList.FindAll(enemy => enemy.GetComponent<EnemyBase>().enemyType == _enemyType).Count;
 	}
 
 	//Update Information inside the Manager when create

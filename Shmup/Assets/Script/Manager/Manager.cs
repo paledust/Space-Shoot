@@ -66,7 +66,7 @@ namespace SimpleManager
     {
         private static readonly Array Colors = Enum.GetValues(typeof(GemColor));
         private readonly Random _rng = new Random();
-
+        
         public override Gem Create()
         {
             var gem = new Gem();
