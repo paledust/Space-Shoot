@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class EnemyBase : MonoBehaviour {
 	static protected GameObject player;
+	static protected EnemyManager enemyManager;
 	public Color32 ShipColor;
 	public Vector2 SpeedRange;
 	[SerializeField] protected float health;
@@ -17,6 +18,7 @@ public class EnemyBase : MonoBehaviour {
 	protected void Awake()
 	{
 		player = GameObject.FindGameObjectWithTag("Player");
+		enemyManager = GameObject.Find("EnemyManager").GetComponent<EnemyManager>();
 	}
 	protected void Start () {
 		if(!GetComponent<AudioSource>())
@@ -78,7 +80,9 @@ public class EnemyBase : MonoBehaviour {
 	{
 		ifKill = true;
 		HitSound();
-		Destroy(gameObject,5.0f);
+		GetComponent<SpriteRenderer>().enabled = false;
+		GetComponent<Collider2D>().enabled = false;
+		enemyManager.Destroy(gameObject);
 		ifMove = false;
 	}
 
