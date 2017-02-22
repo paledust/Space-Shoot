@@ -5,11 +5,12 @@ using UnityEngine;
 public class Enemy_Round : EnemyBase {
 	public float detectRange;
 	public Vector2 CirclingRange;
-	[SerializeField] private float circlingRadius;
+	[SerializeField] private float CirclingRadius;
 	private float distanceToPlayer;
 	// Use this for initialization
 	void Start () {
 		base.Start();
+		CirclingRadius = Random.Range(CirclingRange.x, CirclingRange.y);
 	}
 
 	override protected void Move()
@@ -17,30 +18,12 @@ public class Enemy_Round : EnemyBase {
 		distanceToPlayer = (player.transform.position - transform.position).magnitude;
 		if(distanceToPlayer <= detectRange)
 		{
-			Circling();
+			Circling(CirclingRadius);
 		}
 
 		velocity *= 0.99f;
 		transform.position += velocity;
 	}
-	override protected void ColorInitial()
-	{
-		ShipColor = ColorChoose.ColorLibrary[(int)Random.Range(0,ColorChoose.ColorLibrary.Length)];
-
-		GetComponent<SpriteRenderer>().color = ShipColor;
-		GetComponent<TrailRenderer>().startColor = ShipColor;
-		GetComponent<TrailRenderer>().endColor = ShipColor;
-	}
-
-	override protected void MoveInitial()
-	{
-		circlingRadius = Random.Range(CirclingRange.x, CirclingRange.y);
-	}
 
 	//Enemy will move towards player
-	void Circling()
-	{
-		Vector3 toPlayer = player.transform.position - transform.position;
-		velocity = (toPlayer + Quaternion.Euler(0,0,90) * toPlayer.normalized * circlingRadius).normalized * moveSpeed;
-	}
 }

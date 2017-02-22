@@ -6,7 +6,8 @@ public enum EnemyType{
 	RoundNormal = 0,
 	RoundCrazy = 1,
 	TraceNormal = 2,
-	TranceCrazy = 3
+	TranceCrazy = 3,
+	SpeedUp = 4
 };
 
 public class EnemyManager : MonoBehaviour {
@@ -32,6 +33,7 @@ public class EnemyManager : MonoBehaviour {
 	private SpawnPattern spawnPattern;
 	// Use this for initialization
 	void Start () {
+		// EventManager.Instance.Register(play);
 		//Initialize Enemy Player System
 		if(!EnemyBase.enemyManager)
 		{
@@ -49,27 +51,22 @@ public class EnemyManager : MonoBehaviour {
 
 		ifWave = false;
 		timer = 0.0f;
+
+		EventManager.Instance.Register<EnemyWaveDestroy>(CreateWave);
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		if(!ifWave && CountAll() == 0)
 		{
-			Debug.Log("Waiting");
-			timer += Time.deltaTime;
-			if(timer >= waveCooldown)
-				ifWave = true;
+			ifWave = true;
+			EnemyWaveDestroy waveDestroy = new EnemyWaveDestroy();
+			EventManager.Instance.Fire(waveDestroy);
 		}
 
-		if(ifWave)
+		if(Input.GetKeyDown(KeyCode.K))
 		{
-			for(int i = 0; i<MaxSpawnNum; i++)
-			{
-				EnemyType types = (EnemyType)Random.Range(0,4);
-				CreateEnemy(types);
-			}
-
-			ifWave = false;
+			KillThemAll();
 		}
 	}
 
@@ -123,15 +120,23 @@ public class EnemyManager : MonoBehaviour {
 				_traceCrazy.health = 1.0f;
 
 				break;
+			case EnemyType.SpeedUp:
+				_enemy.GetComponent<SpriteRenderer>().sprite = enemySprite_Circle;
+				_enemy.transform.localScale = Vector3.one * 1;
+				Enemy_SpeedUp _speedUp = _enemy.AddComponent<Enemy_SpeedUp>();
+				_speedUp.enemyType = EnemyType.SpeedUp;
+				_speedUp.SpeedRange = new Vector2(0.02f,0.05f);
+				_speedUp.health = 1.0f;
+
+				break;
 			default:
 				Debug.Log("Can't Create Anything, Sorry!!");
 				return null;
 		}
+		_enemy.GetComponent<EnemyBase>().RegistHandler();
 		//Complete making enemy
 
 		enemyList.Add(_enemy);
-
-		OnCreated();
 		return _enemy;
 	}
 
@@ -139,12 +144,28 @@ public class EnemyManager : MonoBehaviour {
 	{
 		Debug.Log("Enemy:" + enemy.GetComponent<EnemyBase>().ToString() + "Destroy");
 		enemyList.Remove(enemy);
+		enemy.GetComponent<EnemyBase>().UnregistHandler();
 
+		EnemyDestroy enemyDestroy = new EnemyDestroy();
+		EventManager.Instance.Fire(enemyDestroy);
+		
 		Destroy(enemy, 5.0f);
-
-		OnDestroyed();
 	}
 
+	protected void CreateWave(Event e)
+	{
+		Debug.Log("Create");
+		if(ifWave)
+		{
+			for(int i = 0; i<MaxSpawnNum; i++)
+			{
+				EnemyType types = (EnemyType)Random.Range(0,5);
+				CreateEnemy(types);
+			}
+
+			ifWave = false;
+		}
+	}
 	public int CountAll()
 	{
 		return enemyList.Count;
@@ -155,15 +176,11 @@ public class EnemyManager : MonoBehaviour {
 		return enemyList.FindAll(enemy => enemy.GetComponent<EnemyBase>().enemyType == _enemyType).Count;
 	}
 
-	//Update Information inside the Manager when create
-    private void OnCreated()
-    {
-        Debug.Log("Created " + " Enemy");
-    }
-
-	//Update Information inside the Manager when destroy
-    private void OnDestroyed()
-    {
-        Debug.Log("Destroyed " + " Enemy");
-    }
+	protected void KillThemAll()
+	{
+		foreach(GameObject enemy in enemyList)
+		{
+			enemy.GetComponent<EnemyBase>().ApplyDamage(10);
+		}
+	}
 }
