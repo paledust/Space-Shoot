@@ -13,7 +13,7 @@ public class Enemy_Round : EnemyBase {
 		CirclingRadius = Random.Range(CirclingRange.x, CirclingRange.y);
 	}
 
-	override protected void Move()
+	override protected void Behave()
 	{
 		distanceToPlayer = (player.transform.position - transform.position).magnitude;
 		if(distanceToPlayer <= detectRange)

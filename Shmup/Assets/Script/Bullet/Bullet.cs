@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Bullet : MonoBehaviour {
-	public float lifeTime;
 	public float damage;
 	// Use this for initialization
 	void Start () {
+		Destroy(gameObject, 3.0f);
 	}
 
 	void OnCollisionEnter2D(Collision2D collision)
@@ -14,6 +14,7 @@ public class Bullet : MonoBehaviour {
 		if(collision.gameObject.tag == "Enemy")
 		{
 			collision.gameObject.GetComponent<EnemyBase>().ApplyDamage(damage);
+			Destroy(gameObject);
 		}
 	}
 

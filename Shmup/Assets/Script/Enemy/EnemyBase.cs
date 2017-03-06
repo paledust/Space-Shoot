@@ -5,12 +5,13 @@ using UnityEngine;
 public class EnemyBase : MonoBehaviour {
 	static public GameObject player;
 	static public EnemyManager enemyManager;
+	public GameObject bulletPrefeb;
 	public Vector2 SpeedRange;
 	public float health;
 	public EnemyType enemyType;
 	[SerializeField] protected AudioClip destroySound;
 	[SerializeField] protected AudioClip spawnSound;
-	[SerializeField] protected float moveSpeed;
+	protected float moveSpeed;
 	protected Color32 ShipColor;
 	protected Vector3 velocity;
 	protected bool ifMove = true;
@@ -25,8 +26,8 @@ public class EnemyBase : MonoBehaviour {
 		if(!GetComponent<AudioSource>())
 			gameObject.AddComponent<AudioSource>();
 
-		GetComponent<AudioSource>().PlayOneShot(spawnSound);
 		moveSpeed = Random.Range(SpeedRange.x,SpeedRange.y);
+		GetComponent<AudioSource>().PlayOneShot(spawnSound);
 		ColorInitial();
 		MoveInitial();
 	}
@@ -54,7 +55,7 @@ public class EnemyBase : MonoBehaviour {
 	// Update is called once per frame
 	protected void Update () {
 		if(ifMove)
-			Move();
+			Behave();
 		rotate();
 		if(health <= 0.0f && !ifKill)
 			Kill();
@@ -93,7 +94,7 @@ public class EnemyBase : MonoBehaviour {
 	}
 
 	//Describe how the Enemy Move, it's a sandbox function.
-	virtual protected void Move()
+	virtual protected void Behave()
 	{
 		
 	}
@@ -118,7 +119,7 @@ public class EnemyBase : MonoBehaviour {
 	//Set the Velocity Toward Player, it's a tool function
 	protected void TowardPlayer(float Agility)
 	{
-		velocity = Vector3.Lerp(velocity, player.transform.position - transform.position, Agility * Time.deltaTime);
+		velocity = Vector3.Lerp(velocity, (Vector3)((Vector2)player.transform.position - (Vector2)transform.position).normalized * moveSpeed, Agility * Time.deltaTime);
 	}
 
 	protected void CopyMovement(Quaternion originalRotation)
@@ -132,5 +133,12 @@ public class EnemyBase : MonoBehaviour {
 	protected void ResetTarget(GameObject target)
 	{
 		player = target;
+	}
+
+	protected void ShootBullet()
+	{
+		Quaternion lookVec = Quaternion.Euler(0,0,Random.Range(0,360));
+		GameObject new_Bullet = Instantiate (bulletPrefeb, transform.position + lookVec * Vector2.right * 20, lookVec) as GameObject;
+		new_Bullet.GetComponent<Rigidbody2D> ().velocity = lookVec * Vector2.right * 10.0f;
 	}
 }

@@ -12,7 +12,7 @@ public class Enemy_Trace : EnemyBase {
 	}
 
 	//Enemy will copy how the player "control" the ship with different initial speed.
-	override protected void Move()
+	override protected void Behave()
 	{
 		CopyMovement(originalRotation);
 		

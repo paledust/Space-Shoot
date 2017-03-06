@@ -22,7 +22,7 @@ public class Enemy_SpeedUp : EnemyBase {
 		base.Start();
 	}
 
-	override protected void Move()
+	override protected void Behave()
 	{
 		TowardPlayer(agility);
 		velocity = velocity.normalized * Speed;

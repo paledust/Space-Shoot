@@ -7,7 +7,8 @@ public enum EnemyType{
 	RoundCrazy = 1,
 	TraceNormal = 2,
 	TranceCrazy = 3,
-	SpeedUp = 4
+	SpeedUp = 4,
+	Boss = 5
 };
 
 public class EnemyManager : MonoBehaviour {
@@ -154,7 +155,7 @@ public class EnemyManager : MonoBehaviour {
 
 	protected void CreateWave(Event e)
 	{
-		Debug.Log("Create");
+		Debug.Log("Create Wave");
 		if(ifWave)
 		{
 			for(int i = 0; i<MaxSpawnNum; i++)

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Task {
+public abstract class Task: MonoBehaviour {
     public enum TaskStatus{
         Detached,
         Pending,
@@ -21,7 +21,7 @@ public abstract class Task {
     public bool ifFail{get{return Status == TaskStatus.Fail;}}
     public bool ifAborted{get{return Status == TaskStatus.Aborted;}}
     public bool ifFinished{get{return (Status == TaskStatus.Fail || Status == TaskStatus.Success || Status == TaskStatus.Aborted);}}
-
+    public Task NextTask;
 
     internal void SetStatus(TaskStatus newStatus)
     {
@@ -63,13 +63,15 @@ public abstract class Task {
             case TaskStatus.Pending:
                 break;
             default:
-                Debug.Log("No Status");
+                Debug.Log("This Status is Null or not Available");
                 break;
         }
     }
 
     protected virtual void Init()
-    {}
+    {
+        Debug.Log("This is" + typeof(Task).ToString()+" Initialized");
+    }
     protected virtual void OnSuccess()
     {}
     protected virtual void CleanUp()
@@ -78,6 +80,6 @@ public abstract class Task {
     {}
     protected virtual void OnFail()
     {}
-    internal virtual void Update()
+    internal virtual void TUpdate()
     {}
 }
