@@ -10,10 +10,10 @@ public class EnemyDestroy: Event
 {
     public EnemyType enemyType;
 
-    public void setEnemyType(EnemyType _Type)
-    {
-        enemyType = _Type;
-    }
+    // public void setEnemyType(EnemyType _Type)
+    // {
+    //     enemyType = _Type;
+    // }
 }
 
 public class EnemyWaveDestroy: Event

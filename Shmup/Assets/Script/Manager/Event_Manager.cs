@@ -37,7 +37,6 @@ public class EventManager {
     public void Unregister<T>(Event.Handler handler) where T : Event {
         Type type = typeof(T);
         Event.Handler handlers;
-        Debug.Log("Unregister CALLED");
         if (registeredHandlers.TryGetValue(type, out handlers)) {
             handlers -= handler;
             if (handlers == null) {
