@@ -34,7 +34,7 @@ public class EnemyManager : MonoBehaviour {
 	private SpawnPattern spawnPattern;
 	// Use this for initialization
 	void Start () {
-		// EventManager.Instance.Register(play);
+		//EventManager.Instance.Register(play);
 		//Initialize Enemy Player System
 		if(!EnemyBase.enemyManager)
 		{
@@ -54,13 +54,13 @@ public class EnemyManager : MonoBehaviour {
 		timer = 0.0f;
 
 		EventManager.Instance.Register<EnemyWaveDestroy>(CreateWave);
+		EventManager.Instance.Register<CreateEnmey>(CreateWave);
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if(!ifWave && CountAll() == 0)
+		if(CountAll() == 0)
 		{
-			ifWave = true;
 			EnemyWaveDestroy waveDestroy = new EnemyWaveDestroy();
 			EventManager.Instance.Fire(waveDestroy);
 		}
@@ -71,11 +71,19 @@ public class EnemyManager : MonoBehaviour {
 		}
 	}
 
-	//Create Types of Enemy
-	public GameObject CreateEnemy(EnemyType enemyType)
+	private Transform RandomSelectSpawnLocation()
 	{
-		GameObject _enemy = Instantiate(enemyBasicPrefeb, SpawnLocation[Random.Range(0,SpawnLocation.Length)].position,
-			SpawnLocation[Random.Range(0,SpawnLocation.Length)].rotation) as GameObject;
+		return SpawnLocation[Random.Range(0,SpawnLocation.Length)];
+	}
+
+	private Transform SetSpawnLocation(Transform objectTransform)
+	{
+		return objectTransform;
+	}
+	//Create Types of Enemy
+	public GameObject CreateEnemy(EnemyType enemyType, Transform enemyTransform)
+	{
+		GameObject _enemy = Instantiate(enemyBasicPrefeb, enemyTransform) as GameObject;
 
 		_enemy.name = "Enemy" + enemyType.ToString() + CountType(enemyType).ToString();
 		
@@ -141,6 +149,17 @@ public class EnemyManager : MonoBehaviour {
 		return _enemy;
 	}
 
+	public void createWaveAtPos(Event e)
+	{
+		CreateEnmey createEnemy = e as CreateEnmey;
+		Debug.Log("Create Wave");
+		for(int i = 0; i<MaxSpawnNum; i++)
+		{
+			EnemyType types = (EnemyType)Random.Range(0,5);
+			CreateEnemy(types,SetSpawnLocation(createEnemy._transform));
+		}
+	}
+
 	public void Destroy(GameObject enemy)
 	{
 		Debug.Log("Enemy:" + enemy.GetComponent<EnemyBase>().ToString() + "Destroy");
@@ -156,15 +175,10 @@ public class EnemyManager : MonoBehaviour {
 	protected void CreateWave(Event e)
 	{
 		Debug.Log("Create Wave");
-		if(ifWave)
+		for(int i = 0; i<MaxSpawnNum; i++)
 		{
-			for(int i = 0; i<MaxSpawnNum; i++)
-			{
-				EnemyType types = (EnemyType)Random.Range(0,5);
-				CreateEnemy(types);
-			}
-
-			ifWave = false;
+			EnemyType types = (EnemyType)Random.Range(0,5);
+			CreateEnemy(types, RandomSelectSpawnLocation());
 		}
 	}
 	public int CountAll()

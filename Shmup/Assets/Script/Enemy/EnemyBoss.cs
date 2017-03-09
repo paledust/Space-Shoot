@@ -35,4 +35,10 @@ public class EnemyBoss : EnemyBase {
 	{
 		ifMove = _ifMove;
 	}
+
+	override public void RegistHandler()
+	{}
+
+	override public void UnregistHandler()
+	{} 
 }

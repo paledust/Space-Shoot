@@ -16,7 +16,7 @@ public class Task_Appear : Task {
 		if(transform.localScale.x >= 1)
 		{
 			transform.localScale = Vector3.one;
-			SetStatus(Task.TaskStatus.Success);
+			SetStatus(TaskStatus.Success);
 		}
 	}
 }
