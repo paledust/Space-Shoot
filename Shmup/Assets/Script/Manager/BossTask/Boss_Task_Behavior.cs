@@ -8,9 +8,10 @@ public class Boss_Task_Behavior : MonoBehaviour {
 	{
 		if(!GetComponent<Task_Manager>())
 		{
-			taskManager = gameObject.AddComponent<Task_Manager>();
-			InitalTask();
+			gameObject.AddComponent<Task_Manager>();
 		}
+		taskManager = GetComponent<Task_Manager>();
+		InitalTask();
 	}
 	void Update()
 	{
@@ -36,7 +37,6 @@ public class Boss_Task_Behavior : MonoBehaviour {
 		if(GetComponent<Task_Appear>().ifDetached)
 		{
 			Debug.Log("Try Add Appearance");
-			Debug.Log(GetComponent<Task_Appear>().ifDetached);
 			taskManager.AddTask(GetComponent<Task_Appear>());
 		}
 	}

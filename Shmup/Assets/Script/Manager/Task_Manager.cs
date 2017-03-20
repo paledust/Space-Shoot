@@ -14,7 +14,9 @@ public class Task_Manager:MonoBehaviour {
 		foreach (Task task in tasks)
 		{
 			if(task.ifPending) 
+			{
 				task.SetStatus(Task.TaskStatus.Working);
+			}
 
 			if(task.ifFinished) 
 				HandleCompletion(task,i);
@@ -37,10 +39,8 @@ public class Task_Manager:MonoBehaviour {
 
 	public void AddTask(Task task)
 	{
-		Debug.Log("Add Task");
 		Debug.Assert(task != null);
 		Debug.Assert(task.ifDetached);
-		Debug.Log(tasks);
 		tasks.Add(task);
 		task.SetStatus(Task.TaskStatus.Pending);
 	} 

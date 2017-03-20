@@ -11,10 +11,6 @@ public abstract class Task: MonoBehaviour {
         Fail,
         Aborted
     }
-    void Start()
-    {
-        SetStatus(TaskStatus.Detached);
-    }
     public TaskStatus Status{
         get; private set;
     }
