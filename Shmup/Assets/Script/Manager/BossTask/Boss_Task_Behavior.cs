@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class Boss_Task_Behavior : MonoBehaviour {
 	private Task_Manager taskManager;
+	private Task_Appear taskAppear;
+	private Task_Spawn taskSpawn;
+	private Task_Chase taskChase;
+	private Task_Fire taskFire;
 	void Start()
 	{
 		if(!GetComponent<Task_Manager>())
@@ -11,6 +15,7 @@ public class Boss_Task_Behavior : MonoBehaviour {
 			gameObject.AddComponent<Task_Manager>();
 		}
 		taskManager = GetComponent<Task_Manager>();
+
 		InitalTask();
 	}
 	void Update()
@@ -20,24 +25,26 @@ public class Boss_Task_Behavior : MonoBehaviour {
 	// Use this for initialization
 	protected void TaskHandle()
 	{
-		if(GetComponent<EnemyBoss>().health <= GetComponent<EnemyBoss>().MAXHEALTH * 0.5f && GetComponent<Task_Fire>().ifDetached)
+		if(GetComponent<EnemyBoss>().health <= GetComponent<EnemyBoss>().MAXHEALTH * 0.5f && taskFire.ifDetached)
 		{
 			Debug.Log("Try Add Fire");
-			taskManager.AddTask(GetComponent<Task_Fire>());
+			taskManager.AddTask(taskFire);
 		}
 
-		if(GetComponent<EnemyBoss>().health <= GetComponent<EnemyBoss>().MAXHEALTH * 0.15f && GetComponent<Task_Chase>().ifDetached)
+		if(GetComponent<EnemyBoss>().health <= GetComponent<EnemyBoss>().MAXHEALTH * 0.15f && taskChase.ifDetached)
 		{
 			Debug.Log("Try Add Chase");
-			taskManager.AddTask(GetComponent<Task_Chase>());
+			taskManager.AddTask(taskChase);
 		}
 	}
 	protected void InitalTask()
 	{
-		if(GetComponent<Task_Appear>().ifDetached)
-		{
-			Debug.Log("Try Add Appearance");
-			taskManager.AddTask(GetComponent<Task_Appear>());
-		}
+		taskAppear = new Task_Appear(gameObject);
+		taskChase = new Task_Chase(gameObject);
+		taskFire = new Task_Fire(gameObject);
+		taskSpawn = new Task_Spawn(gameObject,10.0f);
+
+		taskAppear.NextTask = taskSpawn;
+		taskManager.AddTask(taskAppear);
 	}
 }

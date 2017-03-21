@@ -2,30 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Task_Manager:MonoBehaviour {
+public class Task_Manager: MonoBehaviour {
 	public List<Task> tasks = new List<Task>();
-	void Start()
-	{
-
-	}
 	void Update()
 	{
-		int i = 0;
-		foreach (Task task in tasks)
+		for(int j = tasks.Count-1; j>= 0; j--)
 		{
+			Task task = tasks[j];
 			if(task.ifPending) 
 			{
 				task.SetStatus(Task.TaskStatus.Working);
 			}
 
 			if(task.ifFinished) 
-				HandleCompletion(task,i);
+				HandleCompletion(task,j);
 			else
 			{
 				task.TUpdate();
-				if(task.ifFinished) HandleCompletion(task,i);
+				if(task.ifFinished) HandleCompletion(task,j);
 			}
-			i++;
 		}
 	}
 

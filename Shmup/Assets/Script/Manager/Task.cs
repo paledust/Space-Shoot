@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Task: MonoBehaviour {
+public abstract class Task {
     public enum TaskStatus{
         Detached,
         Pending,
@@ -12,7 +12,7 @@ public abstract class Task: MonoBehaviour {
         Aborted
     }
     public TaskStatus Status{
-        get; private set;
+        get; protected set;
     }
     public bool ifDetached{get{return Status == TaskStatus.Detached;}}
     public bool ifPending{get{return Status == TaskStatus.Pending;}}
@@ -60,6 +60,8 @@ public abstract class Task: MonoBehaviour {
             // These are "internal" states that are mostly relevant for
             // the task manager
             case TaskStatus.Detached:
+                Debug.Log("Fail Here??");
+                break;
             case TaskStatus.Pending:
                 break;
             default:

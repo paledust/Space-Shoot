@@ -3,12 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Task_Spawn : Task {
+	private GameObject taskObject;
 	private float timer;
 	public float SpawnTime = 1.0f;
+	public Task_Spawn(GameObject m_taskObject, float m_spawnTime)
+	{
+		Status = TaskStatus.Detached;
+		SpawnTime = m_spawnTime;
+		taskObject = m_taskObject;
+	}
 	override protected void Init()
 	{
 		CreateEnmey bossEvent = new CreateEnmey();
-		bossEvent._transform = gameObject.transform;
+		bossEvent._transform = taskObject.transform;
 		EventManager.Instance.Fire(bossEvent);
 		Debug.Log("SPAWNING TASK INITIALIZED");
 	}
@@ -20,7 +27,7 @@ public class Task_Spawn : Task {
 		{
 			timer = 0.0f;
 			CreateEnmey bossEvent = new CreateEnmey();
-			bossEvent._transform = gameObject.transform;
+			bossEvent._transform = taskObject.transform;
 			EventManager.Instance.Fire(bossEvent);
 			Debug.Log("Create Enemy Wave");
 		}

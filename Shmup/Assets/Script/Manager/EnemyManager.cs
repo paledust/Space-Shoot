@@ -174,7 +174,6 @@ public class EnemyManager : MonoBehaviour {
 
 	protected void CreateWave(Event e)
 	{
-		Debug.Log("Create Wave");
 		for(int i = 0; i<MaxSpawnNum; i++)
 		{
 			EnemyType types = (EnemyType)Random.Range(0,5);
