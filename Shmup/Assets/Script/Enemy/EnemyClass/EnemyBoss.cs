@@ -24,7 +24,6 @@ public class EnemyBoss : EnemyBase {
 		float distanceToPlayer = (player.transform.position - transform.position).magnitude;
 		if(distanceToPlayer <= detectRange)
 		{
-			Debug.Log("MOVE");
 			TowardPlayer(0.8f);
 		}
 		transform.position -= velocity;
@@ -44,5 +43,10 @@ public class EnemyBoss : EnemyBase {
 		{
 			Context.OtherMove();
 		}
+	}
+	void OnDestroy()
+	{
+		BossDie tempEvent = new BossDie();
+		EventManager.Instance.Fire(tempEvent);
 	}
 }

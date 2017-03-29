@@ -13,9 +13,12 @@ public class EnemyBase : MonoBehaviour {
 	public EnemyType enemyType;
 	[SerializeField] protected AudioClip destroySound;
 	[SerializeField] protected AudioClip spawnSound;
+	public float SearchingRange = 20.0f;
+	public float FleeRange = 50.0f;
 	protected float moveSpeed;
 	protected Color32 ShipColor;
 	protected Vector3 velocity;
+	protected bool ifChangingColor = false;
 	protected bool ifKill = false;
 	protected virtual void Start () {
 		if(!GetComponent<AudioSource>())
@@ -28,6 +31,7 @@ public class EnemyBase : MonoBehaviour {
 		fsm = new FSM<EnemyBase>(this);
 		fsm.TransitionTo<Searching>();
 		taskManager = new Task_Manager();
+		EventManager.Instance.Register<BossDie>(BossDieHandler);
 	}
 
 	//Initialize the Color 
@@ -52,7 +56,22 @@ public class EnemyBase : MonoBehaviour {
 
 		if(health <= 0.0f && !ifKill)
 			Kill();
+
+		if(ifChangingColor)
+			ChangingColor();
+
 		
+	}
+	protected void ChangingColor()
+	{
+		Color tempColor = Service.ColorLibrary[Random.Range(0,4)];
+		GetComponent<SpriteRenderer>().color = tempColor;
+
+		if(GetComponent<TrailRenderer>())
+		{
+			GetComponent<TrailRenderer>().startColor = tempColor;
+			GetComponent<TrailRenderer>().endColor = tempColor;
+		}
 	}
 
 	//Describe how the Enemy Rotate
@@ -73,13 +92,16 @@ public class EnemyBase : MonoBehaviour {
 	protected void Kill()
 	{
 		ifKill = true;
+		ifChangingColor = false;
 		HitSound();
 		this.enabled = false;
 		GetComponent<SpriteRenderer>().color = Color.gray;
 		if(GetComponent<TrailRenderer>())
+		{
 			GetComponent<TrailRenderer>().startColor = Color.gray;
-
-		GetComponent<TrailRenderer>().endColor = Color.gray;
+			GetComponent<TrailRenderer>().endColor = Color.gray;
+		}
+		
 		GetComponent<Collider2D>().enabled = false;
 		enemyManager.Destroy(gameObject);
 	}
@@ -98,8 +120,9 @@ public class EnemyBase : MonoBehaviour {
 	{}
 	virtual protected void PreSurroundingMove()
 	{
-		TowardPlayer(2.0f);
-		transform.position -= velocity;
+		FleePlayer(2.0f);
+
+		transform.position += velocity;
 	}
 	virtual protected void SurroundingMove()
 	{
@@ -110,14 +133,19 @@ public class EnemyBase : MonoBehaviour {
 	}
 	virtual protected void FleeingMove()
 	{
-		TowardPlayer(0.8f);
-		transform.position -= velocity;
+		FleePlayer(2.0f);
+
+		transform.position += velocity;
 	}
 	virtual public void RegistHandler()
 	{}
 	virtual public void UnregistHandler()
 	{}
 
+	protected void BossDieHandler(Event e)
+	{
+		fsm.TransitionTo<Madness>();
+	}
 	//Surround the Player, it's a tool function
 	protected void Circling(float circlingRadius)
 	{
@@ -130,9 +158,9 @@ public class EnemyBase : MonoBehaviour {
 	{
 		velocity = Vector3.Lerp(velocity, (Vector3)((Vector2)player.transform.position - (Vector2)transform.position).normalized * moveSpeed, Agility * Time.deltaTime);
 	}
-	protected void Patrol()
+	protected void FleePlayer(float Agility)
 	{
-		
+		velocity = Vector3.Lerp(velocity, (Vector3)((Vector2)transform.position - (Vector2)player.transform.position).normalized * moveSpeed, Agility * Time.deltaTime);
 	}
 	protected void CopyMovement(Quaternion originalRotation)
 	{
@@ -165,38 +193,100 @@ public class EnemyBase : MonoBehaviour {
 			return Context.gameObject.transform.position - Service.player.transform.position;
 		}
 	}
-
 	public class Searching: EnemyState{
+		private float timer = 0.0f;
+		private Vector3 originalScale;
+		public override void Init()
+		{
+			timer = 0.0f;
+			Context.ifChangingColor = false;
+			originalScale = Context.transform.localScale;
+		}
+		public override void OnEnter()
+		{
+			timer = 0.0f;
+			Context.ifChangingColor = false;
+			Debug.Log("Transfer");
+		}
 		public override void Update()
 		{
-			if(getDistanceToPlayer().magnitude <= 8.0f) 
+			if(Context.transform.localScale != originalScale)
+				Context.transform.localScale = Vector3.Lerp(originalScale * 5, originalScale, Easing.BackEaseInOut(timer));
+			timer += Time.deltaTime;
+			if(getDistanceToPlayer().magnitude <= 10.0f) 
 				TransitionTo<Surr_Prep>();
 			Context.SearchingMove();
 		}
 	}
 	public class Surr_Prep: EnemyState{
+		private float timer;
+		private Vector3 originalScale;
+		public override void Init()
+		{
+			Context.ifChangingColor = true;
+			originalScale = Context.transform.localScale;
+			timer = 0.0f;
+
+			EventManager.Instance.Register<EnemyDestroy>(escape);
+		}
 		public override void OnEnter()
 		{
-			Context.PreSurroundingMove();
-			TransitionTo<Surr>();
+			Context.ifChangingColor = true;
+			timer = 0.0f;
 		}
 		public override void Update()
 		{
-			TransitionTo<Surr>();
+			timer += Time.deltaTime;
+			Context.transform.localScale = Vector3.Lerp(originalScale, originalScale * 5, Easing.BackEaseInOut(timer));
+
+			Context.PreSurroundingMove();
+			if(Context.transform.localScale == originalScale * 5)
+				TransitionTo<Surr>();
+		}
+		private void escape(Event e)
+		{
+			TransitionTo<Flee>();
 		}
 	}
 	public class Surr: EnemyState{
 		public override void Update()
 		{
 			Context.SurroundingMove();
-			if(getDistanceToPlayer().magnitude >= 10.0f)
+			if(getDistanceToPlayer().magnitude >= Context.SearchingRange)
 				TransitionTo<Searching>();
 		}
 	}
 	public class Flee: EnemyState{
 		public override void Update()
 		{
+			if(getDistanceToPlayer().magnitude >= Context.FleeRange)
+				TransitionTo<Searching>();
+
 			Context.FleeingMove();
+		}
+	}
+	public class Madness: EnemyState{
+		float circlingRadius;
+		float speed;
+		float timer;
+		public override void Init()
+		{
+			timer = 0.0f;
+			circlingRadius = 150;
+			speed = 2.0f;
+
+			Context.moveSpeed = speed;
+		}
+		public override void Update()
+		{
+			timer += Time.deltaTime;
+
+			Context.moveSpeed = Mathf.Lerp(speed, 20.0f, Easing.BackEaseIn(timer/7.0f));
+			circlingRadius = Mathf.Lerp(150.0f, 3.0f, Easing.BackEaseIn(timer/7.0f));
+
+			Context.Circling(circlingRadius);
+
+			Context.transform.position += Context.velocity;
 		}
 	}
 }

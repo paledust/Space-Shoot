@@ -92,6 +92,7 @@ public class EnemyManager : MonoBehaviour {
 				_round.CirclingRange = new Vector2(50,200);
 				_round.detectRange = 20.0f;
 				_round.health = 1.0f;
+				_round.SearchingRange = 3.0f;
 
 				break;
 			case EnemyType.RoundCrazy:
@@ -102,6 +103,7 @@ public class EnemyManager : MonoBehaviour {
 				_roundCrazy.CirclingRange = new Vector2(15,17);
 				_roundCrazy.detectRange = 20.0f;
 				_roundCrazy.health = 1.0f;
+				_roundCrazy.SearchingRange = 0.0f;
 
 				break;
 			case EnemyType.TraceNormal:

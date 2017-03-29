@@ -12,21 +12,11 @@ public class EnemyDestroy: Event
 }
 
 public class EnemyWaveDestroy: Event
-{
-    //public delegate void Handler(PlayerShootEvent e);
-}
-
-public class BossIn50Health: Event
-{
-
-}
-
+{}
+public class BossDie: Event
+{}
 public class CreateEnmey: Event
 {
     public Transform _transform;
 }
 
-public class BossCreateEnemy: Event
-{
-    
-}
