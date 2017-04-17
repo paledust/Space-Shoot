@@ -40,7 +40,7 @@ public class Control : MonoBehaviour
 
 	void Move ()
 	{
-		Vector3 idealVel = new Vector3 (Input.GetAxis ("Horizontal"), Input.GetAxis ("Vertical"), transform.position.z).normalized;
+		Vector3 idealVel = new Vector3 (Input.GetAxis ("Horizontal"), Input.GetAxis ("Vertical"), 0.0f).normalized;
 		velocity = Vector3.Lerp (velocity, idealVel, Time.deltaTime * speed);
 		if (velocity.magnitude <= 0.01) {
 			velocity = Vector3.zero;

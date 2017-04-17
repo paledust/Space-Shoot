@@ -9,8 +9,6 @@ public class CameraBehavior : MonoBehaviour {
 	private bool ifFollow;
 	// Use this for initialization
 	void Start () {
-		transform.position = new Vector3(lockTransform.position.x, lockTransform.position.y, transform.position.z);
-
 		ifFollow = true;
 	}
 	
@@ -21,9 +19,12 @@ public class CameraBehavior : MonoBehaviour {
 
 	void CameraMove()
 	{
-		if(ifFollow)
+		if(ifFollow && lockTransform != null)
 			transform.position = Vector3.Slerp(transform.position, 
 												new Vector3(lockTransform.position.x, lockTransform.position.y, transform.position.z),
 												Time.deltaTime * Follow_Speed);
+	}
+	public void SetFollowTrans(Transform followTrans){
+		lockTransform = followTrans;
 	}
 }

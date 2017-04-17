@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyBoss : EnemyBase {
+public class EnemyBoss : Enemy_FSM_Enemy {
 	public float detectRange = 30.0f;
 	public float MAXHEALTH = 100;
 	public bool ifShoot = false;
@@ -21,7 +21,7 @@ public class EnemyBoss : EnemyBase {
 	}
 	internal override void OtherMove()
 	{
-		float distanceToPlayer = (player.transform.position - transform.position).magnitude;
+		float distanceToPlayer = (Service.player.transform.position - transform.position).magnitude;
 		if(distanceToPlayer <= detectRange)
 		{
 			TowardPlayer(0.8f);
@@ -47,6 +47,6 @@ public class EnemyBoss : EnemyBase {
 	void OnDestroy()
 	{
 		BossDie tempEvent = new BossDie();
-		EventManager.Instance.Fire(tempEvent);
+		Service.eventManager.Fire(tempEvent);
 	}
 }

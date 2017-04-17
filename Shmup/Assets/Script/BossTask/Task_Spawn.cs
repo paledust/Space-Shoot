@@ -16,7 +16,7 @@ public class Task_Spawn : Task {
 	{
 		CreateEnmey bossEvent = new CreateEnmey();
 		bossEvent._transform = taskObject.transform;
-		EventManager.Instance.Fire(bossEvent);
+		Service.eventManager.Fire(bossEvent);
 	}
 
 	override internal void TUpdate()
@@ -24,10 +24,11 @@ public class Task_Spawn : Task {
 		timer += Time.deltaTime;
 		if(timer >= SpawnTime)
 		{
+			Debug.Log("Spawn");
 			timer = 0.0f;
 			CreateEnmey bossEvent = new CreateEnmey();
 			bossEvent._transform = taskObject.transform;
-			EventManager.Instance.Fire(bossEvent);
+			Service.eventManager.Fire(bossEvent);
 		}
 	}
 }

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public static class Service {
 	public static GameObject player{get;set;}
@@ -11,4 +9,8 @@ public static class Service {
 	static private Color color_4 = new Color32(38,47,38,255);
 
 	static public Color[] ColorLibrary = new Color[4]{color_1,color_2,color_3,color_4};
+	static public SceneManager<TransitionData> sceneManager;
+	static public EventManager eventManager;
+	static public EnemyManager enemyManager;
+	static public PrefebObj prefebObj;
 }

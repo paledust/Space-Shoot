@@ -21,13 +21,11 @@ public class Boss_Task_Behavior : MonoBehaviour {
 	{
 		if(GetComponent<EnemyBoss>().health <= GetComponent<EnemyBoss>().MAXHEALTH * 0.5f && taskFire.ifDetached)
 		{
-			Debug.Log("Try Add Fire");
 			taskManager.AddTask(taskFire);
 		}
 
 		if(GetComponent<EnemyBoss>().health <= GetComponent<EnemyBoss>().MAXHEALTH * 0.15f && taskChase.ifDetached)
 		{
-			Debug.Log("Try Add Chase");
 			taskManager.AddTask(taskChase);
 		}
 	}

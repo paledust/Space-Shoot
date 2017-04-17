@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy_Round : EnemyBase {
+public class Enemy_Round : Enemy_FSM_Enemy {
 	public float detectRange;
 	public Vector2 CirclingRange;
 	[SerializeField] private float CirclingRadius;
@@ -19,10 +19,9 @@ public class Enemy_Round : EnemyBase {
 		tempRadius = CirclingRadius;
 	}
 
-
 	protected override void SearchingMove()
 	{
-		distanceToPlayer = (player.transform.position - transform.position).magnitude;
+		distanceToPlayer = (Service.player.transform.position - transform.position).magnitude;
 		if(distanceToPlayer <= detectRange)
 		{
 			timer += Time.deltaTime;
@@ -31,7 +30,6 @@ public class Enemy_Round : EnemyBase {
 
 			Circling(CirclingRadius);
 		}
-		//timer = 0.0f;
 		velocity *= 0.99f;
 		transform.position += velocity;
 	}

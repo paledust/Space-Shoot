@@ -15,8 +15,6 @@ public class EnemyWaveDestroy: Event
 {}
 public class BossDie: Event
 {}
-public class CreateEnmey: Event
-{
+public class CreateEnmey: Event{
     public Transform _transform;
 }
-

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy_Trace : EnemyBase {
+public class Enemy_Trace : Enemy_FSM_Enemy {
 	private Quaternion originalRotation;
 	
 	protected override void Start()

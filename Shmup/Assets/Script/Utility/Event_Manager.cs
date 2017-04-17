@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class EventManager {
 
@@ -55,5 +54,8 @@ public class EventManager {
         if (registeredHandlers.TryGetValue(type, out handlers)) {
             handlers(e);
         }
+    }
+    public void ClearList(){
+        registeredHandlers.Clear();
     }
 }

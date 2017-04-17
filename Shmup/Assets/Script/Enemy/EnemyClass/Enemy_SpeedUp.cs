@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy_SpeedUp : EnemyBase {
+public class Enemy_SpeedUp : Enemy_FSM_Enemy {
 	[SerializeField] float Speed{
 		get{
 			return moveSpeed;
@@ -30,7 +30,6 @@ public class Enemy_SpeedUp : EnemyBase {
 
 	public void Handler_SpeedUp(Event e)
 	{
-		Debug.Log("SPEED UP CALLED");
 		float addSpeed = 0.0f;
 		EnemyDestroy enemyDestroy = e as EnemyDestroy;
 		switch (enemyDestroy.enemyType)
@@ -54,11 +53,11 @@ public class Enemy_SpeedUp : EnemyBase {
 
 	override public void UnregistHandler()
 	{
-		EventManager.Instance.Unregister<EnemyDestroy>(Handler_SpeedUp);
+		Service.eventManager.Unregister<EnemyDestroy>(Handler_SpeedUp);
 	}
 
 	override public void RegistHandler()
 	{
-		EventManager.Instance.Register<EnemyDestroy>(Handler_SpeedUp);
+		Service.eventManager.Register<EnemyDestroy>(Handler_SpeedUp);
 	}
 }
